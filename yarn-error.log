@@ -1,0 +1,57 @@
+Arguments: 
+  /opt/homebrew/Cellar/node/20.4.0/bin/node /opt/homebrew/bin/yarn add svelte-navigator
+
+PATH: 
+  /opt/homebrew/bin:/opt/homebrew/sbin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Library/Apple/usr/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Users/shubh/miniconda3/bin:/Users/shubh/miniconda3/condabin:/opt/homebrew/bin:/opt/homebrew/sbin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/usr/local/mysql-8.0.29-macos12-arm64/bin:/Users/shubh/Downloads/flutter/bin:/usr/local/mysql-8.0.29-macos12-arm64/bin:/Users/shubh/Downloads/flutter/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  20.4.0
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  Error: ENOENT: no such file or directory, copyfile '/Users/shubh/Library/Caches/Yarn/v6/npm-glob-parent-6.0.2-6d237d99083950c79290f24c7642a3de9a28f9e3-integrity/node_modules/glob-parent/README.md' -> '/Users/shubh/Desktop/nervesparkFrontend-app/node_modules/tailwindcss/node_modules/glob-parent/README.md'
+
+npm manifest: 
+  {
+    "name": "svelte-app",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+      "build": "rollup -c",
+      "dev": "rollup -c -w",
+      "start": "sirv public --no-clear"
+    },
+    "devDependencies": {
+      "@rollup/plugin-commonjs": "^24.0.0",
+      "@rollup/plugin-node-resolve": "^15.0.0",
+      "@rollup/plugin-terser": "^0.4.0",
+      "autoprefixer": "^10.4.16",
+      "flowbite": "^2.2.1",
+      "flowbite-svelte": "^0.44.21",
+      "postcss": "^8.4.32",
+      "rollup": "^3.15.0",
+      "rollup-plugin-css-only": "^4.3.0",
+      "rollup-plugin-livereload": "^2.0.0",
+      "rollup-plugin-svelte": "^7.1.2",
+      "svelte": "^3.55.0",
+      "tailwindcss": "^3.4.0"
+    },
+    "dependencies": {
+      "axios": "^1.6.3",
+      "sirv-cli": "^2.0.0",
+      "svelte-query": "^0.0.1-alpha1",
+      "svelte-spa-router": "^4.0.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
