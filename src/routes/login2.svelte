@@ -1,4 +1,6 @@
+<!-- ======================script begin===================================== -->
 <script>
+  //===================imports========================//
   import { setAuth } from "../stores/auth";
   import axios from "axios";
   import Index from "./dealer/index.svelte";
@@ -10,6 +12,7 @@
   let error = null;
   let loggedIn = false;
   let carsData = [];
+  let DealershipsData = [];
   let carsdata = false;
 
   import {
@@ -18,11 +21,12 @@
     SidebarItem,
     SidebarWrapper,
   } from "flowbite-svelte";
+  //========================================================//
 
   let spanClass = "flex-1 ms-3 whitespace-nowrap";
 
+  //get all cars of user
   function fetchCarsData(token) {
-    // Use the stored token to make the API call
     console.log("inside fetchcars data");
     axios
       .get("http://localhost:8000/user/viewAllCars", {
@@ -33,8 +37,6 @@
       })
       .then((response) => {
         console.log("taking response");
-        // carsData = response.data; // Set the response data to the variable
-        // console.log(carsData);
         const carsInformation = JSON.parse(response.data.carsInformation);
         carsData = Object.values(carsInformation);
       })
@@ -43,6 +45,28 @@
       });
   }
 
+  //get all dealerships
+  function fetchDealerships(token) {
+    console.log("inside fetchcars data");
+    axios
+      .get("http://localhost:8000/user/dealerships", {
+        headers: {
+          Authorization: token,
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("taking response");
+        DealershipsData = JSON.parse(response.data.dealershipInformation);
+
+        console.log(DealershipsData);
+      })
+      .catch((error) => {
+        console.error("Error fetching cars data", error);
+      });
+  }
+
+  //handle login
   async function handleLogin() {
     try {
       const response = await axios.post("http://localhost:8000/user/login", {
@@ -58,6 +82,7 @@
       if (token) {
         loggedIn = true;
         fetchCarsData(token);
+        fetchDealerships(token);
       }
     } catch (error) {
       console.error("Login failed", error);
@@ -66,23 +91,35 @@
     }
   }
 
-  //testing for button click to open the user car collection
-  let display = "none"; // Initial display property value
+  // Initial display property value
+  let display = "none";
 
+  //toggle display div
   function toggleDisplay() {
-    // Toggle display property value between 'none' and 'block'
     display = display === "none" ? "block" : "none";
-
-    // Update the style attribute of the element
     document.querySelector(".carCollection").style.display = display;
   }
+
+  //toggle dealerships div
+  function toggleDealerships() {
+    display = display === "none" ? "block" : "none";
+    document.querySelector(".dealerships").style.display = display;
+  }
 </script>
+
+<!-- ======================script end=============================== -->
+
+<!-- =============================================================== -->
+<!-- ========================main body start ============================= -->
+<!-- =============================================================== -->
 
 {#if loggedIn}
   <div class="col-mg-12" style="display: flex;">
     <div class="col-mg-3 sidebar">
       <button on:click={toggleDisplay} id="mycars">My Cars</button>
+      <button on:click={toggleDealerships} id="mycars">Dealerships</button>
     </div>
+    <!-- my cars -->
     <div class="col-mg-7 carCollection" style="margin: 40px; display: none">
       <!-- <h1>User Logged in</h1> -->
       <h2>User Car Collection</h2>
@@ -96,12 +133,34 @@
               Model: {car.model}, Color: {car.car_info.color}, Mileage: {car
                 .car_info.mileage}
             </p>
-            <!-- Include other card content if needed -->
-            <!-- <Button class="buy-button">Buy Now!</Button> -->
           </Card>
         {/each}
       {:else}
         <p>No cars data available</p>
+      {/if}
+    </div>
+
+    <!-- dealerships -->
+    <!-- dealerships -->
+    <!-- dealerships -->
+    <div class="col-mg-7 dealerships" style="margin: 40px; display: none">
+      <h2>Dealerships</h2>
+      {#if DealershipsData.length > 0}
+        {#each DealershipsData as dealership (dealership.dealership_id)}
+          <Card class="car-card" key={dealership.dealership_id}>
+            <h5 class="car-title">{dealership.dealership_name}</h5>
+            {#if dealership.dealership_info}
+              <p class="car-details">
+                Location: {dealership.dealership_location}, Established Year: {dealership
+                  .dealership_info.establishedYear}
+              </p>
+            {/if}
+            <!-- Include other card content if needed -->
+            <Button class="buy-button">Select Dealer</Button>
+          </Card>
+        {/each}
+      {:else}
+        <p>No dealerships data available</p>
       {/if}
     </div>
   </div>
@@ -125,6 +184,11 @@
   </main>
 {/if}
 
+<!-- =============================================================== -->
+<!-- ========================main body end============================= -->
+<!-- =============================================================== -->
+
+<!-- =============================================================== -->
 <style>
   .centered {
     display: flex;
@@ -176,6 +240,16 @@
     color: #333;
   }
   .carCollection {
+    margin: 34px;
+    margin-top: 34px;
+    background-color: aliceblue;
+    margin-top: 44px;
+    height: 294px;
+    width: 300px;
+    padding: 8px;
+    overflow: scroll;
+  }
+  .dealerships {
     margin: 34px;
     margin-top: 34px;
     background-color: aliceblue;
