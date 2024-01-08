@@ -15,6 +15,7 @@
   let DealershipsData = [];
   let DealerCars = [];
   let carsdata = false;
+  let Deals = true;
 
   import {
     Sidebar,
@@ -44,6 +45,36 @@
       .catch((error) => {
         console.error("Error fetching cars data", error);
       });
+  }
+
+  //fetch deals on cars by deals
+  async function fetchDealsOnCars(CarId) {
+    const token = sessionStorage.getItem("authToken");
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/user/viewdealonCars/${CarId}`,
+        {
+          headers: {
+            Authorization: `${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response && response.message == "No deals found.") {
+        console.log("no deals found");
+        return null;
+      } else {
+        console.log("Deals fetched successfully:", response.data);
+        return response;
+      }
+
+      // You can handle the response data as needed, e.g., updating a variable or triggering other actions
+      // return response.data;
+      //  return response.data && response.data.length > 0;
+    } catch (error) {
+      console.error("Error fetching deals on cars", error);
+      return null;
+    }
   }
 
   //get all dealerships
@@ -244,8 +275,16 @@
                     <div class="car-card">
                       <p>{car.name} ({car.type})</p>
                       <button class="buy-button" on:click={() => handleBuy(car)}
-                        >Buy Now!</button
+                        >Buy now!</button
                       >
+                      {#await fetchDealsOnCars(car._id) then response}
+                        {#if response}
+                          <button
+                            class="buy-button"
+                            on:click={() => handleBuy(car)}>View Deals!</button
+                          >
+                        {/if}
+                      {/await}
                     </div>
                   {/each}
                 </ul>
