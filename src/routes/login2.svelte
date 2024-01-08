@@ -13,6 +13,7 @@
   let loggedIn = false;
   let carsData = [];
   let DealershipsData = [];
+  let DealerCars = [];
   let carsdata = false;
 
   import {
@@ -66,6 +67,30 @@
       });
   }
 
+  //getcars of dealers
+  async function fetchCarNames(carIds) {
+    console.log(carIds);
+    const token = sessionStorage.getItem("authToken");
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/user/getcarsbyid",
+        {
+          headers: {
+            Authorization: token,
+            "Content-Type": "application/json",
+          },
+          params: {
+            ids: carIds,
+          },
+        }
+      );
+      console.log(response.data);
+      DealerCars = JSON.parse(response.data.carsData);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
   //handle login
   async function handleLogin() {
     try {
@@ -99,11 +124,36 @@
     display = display === "none" ? "block" : "none";
     document.querySelector(".carCollection").style.display = display;
   }
-
+  let selectedDealerData;
   //toggle dealerships div
   function toggleDealerships() {
     display = display === "none" ? "block" : "none";
     document.querySelector(".dealerships").style.display = display;
+  }
+
+  //toogle dealerinfo
+  function toggleDealershipsinfo() {
+    display = display === "none" ? "block" : "none";
+    document.querySelector(".dealershipqinfo").style.display = display;
+  }
+
+  //select dealer display
+  function selectDealer(dealerId) {
+    console.log("Selected Dealer ID:", dealerId);
+    selectedDealerData = DealershipsData.find(
+      (dealership) => dealership.dealership_id === dealerId
+    );
+    console.log("Selected Dealer Data:", selectedDealerData);
+    // //   Add any additional logic you want to perform when a dealer is selected
+    // toggleDealershipsinfo();
+    display = display === "none" ? "block" : "none";
+    document.querySelector(".dealershipinfo").style.display = display;
+  }
+
+  //handel buy if user cliclk buy button
+  function handleBuy(car) {
+    // Add your logic to handle the buy button click for the specific car
+    console.log("Buy button clicked for", car.name);
   }
 </script>
 
@@ -114,6 +164,7 @@
 <!-- =============================================================== -->
 
 {#if loggedIn}
+  userLogedin
   <div class="col-mg-12" style="display: flex;">
     <div class="col-mg-3 sidebar">
       <button on:click={toggleDisplay} id="mycars">My Cars</button>
@@ -122,7 +173,7 @@
     <!-- my cars -->
     <div class="col-mg-7 carCollection" style="margin: 40px; display: none">
       <!-- <h1>User Logged in</h1> -->
-      <h2>User Car Collection</h2>
+      <h2>Car Collection</h2>
       {#if carsData.length > 0}
         {#each carsData as car (car.car_id)}
           <Card class="car-card">
@@ -141,8 +192,6 @@
     </div>
 
     <!-- dealerships -->
-    <!-- dealerships -->
-    <!-- dealerships -->
     <div class="col-mg-7 dealerships" style="margin: 40px; display: none">
       <h2>Dealerships</h2>
       {#if DealershipsData.length > 0}
@@ -156,11 +205,58 @@
               </p>
             {/if}
             <!-- Include other card content if needed -->
-            <Button class="buy-button">Select Dealer</Button>
+            <!-- <Button class="buy-button">Select Dealer</Button> -->
+            <!-- <button on:click={toggleDisplay} id="mycars">Select Dealer</button> -->
+            <button
+              on:click={() => selectDealer(dealership.dealership_id)}
+              id="mycars"
+            >
+              Select Dealer
+            </button>
           </Card>
         {/each}
       {:else}
         <p>No dealerships data available</p>
+      {/if}
+    </div>
+
+    <!-- dealership info -->
+    <div
+      class="col-mg-5 dealershipinfo"
+      style="margin: 40px; display: none; width: 50%"
+    >
+      {#if selectedDealerData}
+        <h3>Selected Dealer Details</h3>
+        <p>Location: {selectedDealerData.dealership_location}</p>
+        <p>
+          Established Year: {selectedDealerData.dealership_info.establishedYear}
+        </p>
+        <!-- Add more details as needed -->
+        <ul>
+          <li>Email: {selectedDealerData.dealership_email}</li>
+          <!-- <li>Deals: {selectedDealerData.deals.join(", ")}</li> -->
+          <li>
+            Cars:
+            {#await fetchCarNames(selectedDealerData.cars) then _}
+              {#if DealerCars.length > 0}
+                <ul style="display: flex;">
+                  {#each DealerCars as car (car._id)}
+                    <div class="car-card">
+                      <p>{car.name} ({car.type})</p>
+                      <button class="buy-button" on:click={() => handleBuy(car)}
+                        >Buy Now!</button
+                      >
+                    </div>
+                  {/each}
+                </ul>
+              {:else}
+                <p>Loading car names...</p>
+              {/if}
+            {/await}
+          </li>
+
+          <!-- Add more details as needed -->
+        </ul>
       {/if}
     </div>
   </div>
@@ -183,6 +279,12 @@
     </div>
   </main>
 {/if}
+
+<!-- make id accesable on select dealer 
+then open div show dealerhsip details 
+then let user select the car to buy
+then after this 
+ -->
 
 <!-- =============================================================== -->
 <!-- ========================main body end============================= -->
@@ -271,5 +373,27 @@
     width: 160px;
     color: white;
     background-color: #ff7139;
+  }
+  #mycars:hover {
+    background-color: #007bff;
+  }
+
+  /* dealer cars */
+  /* Add your styling for the cards here */
+  .car-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    width: 200px;
+    text-align: center;
+  }
+
+  .buy-button {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
   }
 </style>
